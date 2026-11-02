@@ -16,7 +16,14 @@ import {
 import { destinationInput, enquiryInput, loginInput, messagePatch, postInput } from './schemas'
 import { DATA_DIR, destinations, enquiries, initStore, posts } from './store'
 import { injectSeo } from './seo'
-import { emptyProgress, createGameQuestions, dailyChallengeId, publicQuestion } from './game'
+import {
+  emptyProgress,
+  createGameQuestions,
+  createTriviaQuestions,
+  dailyChallengeId,
+  publicQuestion,
+  TRAVEL_TRIVIA_UNLOCK_XP,
+} from './game'
 import { gameAnswerInput, gameSessionInput } from './schemas'
 import { gameProgress, gameSessions } from './store'
 import { guestIdFor } from './auth'
@@ -136,11 +143,21 @@ export async function createApp() {
 
   api.post('/game/sessions', rateLimit(8, 60 * 60_000), async (req, res) => {
     const input = gameSessionInput.parse(req.body)
-    if (input.challengeId !== dailyChallengeId()) return res.status(400).json({ error: 'That challenge has expired. Start today’s challenge instead.' })
+    const missionType = input.challengeId.startsWith('travel-trivia-') ? 'travel-trivia' : 'destination-detective'
+    if (input.challengeId !== dailyChallengeId(missionType)) return res.status(400).json({ error: 'That challenge has expired. Start today’s challenge instead.' })
     const playerId = guestIdFor(req, res)
+    const progress = gameProgress.find((item) => item.id === playerId) ?? emptyProgress(playerId)
+    if (missionType === 'travel-trivia' && progress.experience < TRAVEL_TRIVIA_UNLOCK_XP) {
+      return res.status(403).json({ error: `Travel Trivia unlocks at ${TRAVEL_TRIVIA_UNLOCK_XP} XP. Earn XP in Destination Detective first.` })
+    }
     const available = destinations.all().filter((destination) => destination.published)
-    if (available.length < 5) return res.status(503).json({ error: 'The daily challenge needs at least five published destinations.' })
-    const questions = createGameQuestions(available, 5, input.challengeId)
+    if (missionType === 'destination-detective' && available.length < 5) {
+      return res.status(503).json({ error: 'Destination Detective needs at least five published destinations.' })
+    }
+    const questions = missionType === 'travel-trivia'
+      ? createTriviaQuestions(available, 5, input.challengeId)
+      : createGameQuestions(available, 5, input.challengeId)
+    if (questions.length < 5) return res.status(503).json({ error: 'Travel Trivia needs five published destinations in different countries.' })
     const session = {
       id: randomUUID(),
       playerId,

@@ -41,6 +41,7 @@ export default function App() {
         <Route path="play" element={<Play />} />
         <Route path="adventure" element={<Play />} />
         <Route path="adventure/detective" element={<Play />} />
+        <Route path="adventure/trivia" element={<Play />} />
         <Route path="passport" element={<Passport />} />
         <Route path="my-adventures" element={<Passport />} />
         <Route path="privacy" element={<LegalPage kind="privacy" />} />

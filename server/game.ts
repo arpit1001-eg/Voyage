@@ -1,7 +1,10 @@
 import type { Destination } from '../shared/types'
+import { ROUTE_CHALLENGE_UNLOCK_XP, TRAVEL_TRIVIA_UNLOCK_XP } from '../shared/game'
 import { fallbackDestinationImage } from '../shared/destinationImages'
 
-export type GameChoice = { slug: string; name: string; country: string }
+export { ROUTE_CHALLENGE_UNLOCK_XP, TRAVEL_TRIVIA_UNLOCK_XP }
+
+export type GameChoice = { slug: string; name: string; country: string; detail?: string }
 export type GameQuestion = {
   prompt: string
   correctSlug: string
@@ -38,6 +41,8 @@ export type PublicQuestion = {
   image: string
 }
 
+export type GameMissionType = 'destination-detective' | 'travel-trivia'
+
 const shuffle = <T>(items: T[], seed: string) => {
   const shuffled = [...items]
   let state = 2166136261
@@ -56,8 +61,8 @@ const shuffle = <T>(items: T[], seed: string) => {
   return shuffled
 }
 
-export const dailyChallengeId = (date = new Date()) =>
-  `destination-detective-${date.toISOString().slice(0, 10)}`
+export const dailyChallengeId = (type: GameMissionType = 'destination-detective', date = new Date()) =>
+  `${type}-${date.toISOString().slice(0, 10)}`
 
 export const createGameQuestions = (items: Destination[], count = 5, seed = 'voyage-daily-challenge'): GameQuestion[] => {
   const destinations = shuffle(items, `${seed}:destinations`).slice(0, count)
@@ -66,6 +71,36 @@ export const createGameQuestions = (items: Destination[], count = 5, seed = 'voy
     const choices = shuffle([destination, ...distractors], `${seed}:${destination.slug}:order`).map(({ slug, name, country }) => ({ slug, name, country }))
     return {
       prompt: destination.summary,
+      correctSlug: destination.slug,
+      image: destination.cover || fallbackDestinationImage(destination.slug),
+      choices,
+      explanation: `${destination.name} is in ${destination.country}.`,
+    }
+  })
+}
+
+export const createTriviaQuestions = (items: Destination[], count = 5, seed = 'voyage-travel-trivia'): GameQuestion[] => {
+  const usedCountries = new Set<string>()
+  const destinations = shuffle(items, `${seed}:destinations`).filter((destination) => {
+    if (usedCountries.has(destination.country)) return false
+    usedCountries.add(destination.country)
+    return true
+  }).slice(0, count)
+  const countryChoices = destinations.length >= count ? destinations : []
+
+  return countryChoices.map((destination) => {
+    const distractors = shuffle(
+      countryChoices.filter((item) => item.id !== destination.id),
+      `${seed}:${destination.slug}:choices`,
+    ).slice(0, 3)
+    const choices = shuffle([destination, ...distractors], `${seed}:${destination.slug}:order`).map((item) => ({
+      slug: item.slug,
+      name: item.country,
+      country: item.country,
+      detail: item.region,
+    }))
+    return {
+      prompt: `Which country is home to ${destination.name}?`,
       correctSlug: destination.slug,
       image: destination.cover || fallbackDestinationImage(destination.slug),
       choices,

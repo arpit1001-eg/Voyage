@@ -102,3 +102,83 @@ test('game answers are server checked and daily rewards cannot be claimed twice'
   assert.equal(repeated.progress.experience, reward.progress.experience)
   assert.equal(repeated.rewardXp, reward.rewardXp)
 })
+
+test('Travel Trivia is locked until the first Detective reward and scores answers server-side', async () => {
+  const progressResponse = await fetch(`${baseUrl}/api/game/progress`)
+  const cookie = progressResponse.headers.get('set-cookie')?.split(';')[0]
+  assert.ok(cookie)
+  const date = new Date().toISOString().slice(0, 10)
+
+  const startTrivia = () => fetch(`${baseUrl}/api/game/sessions`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', cookie },
+    body: JSON.stringify({ challengeId: `travel-trivia-${date}` }),
+  })
+
+  const locked = await startTrivia()
+  assert.equal(locked.status, 403)
+
+  const detective = await fetch(`${baseUrl}/api/game/sessions`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', cookie },
+    body: JSON.stringify({ challengeId: `destination-detective-${date}` }),
+  })
+  assert.equal(detective.status, 201)
+  const detectiveSession = await detective.json() as { id: string; question: { index: number; choices: { slug: string }[] } }
+  let question: { index: number; choices: { slug: string }[] } | null = detectiveSession.question
+  for (let index = 0; index < 5; index += 1) {
+    assert.ok(question)
+    const response = await fetch(`${baseUrl}/api/game/sessions/${detectiveSession.id}/answer`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', cookie },
+      body: JSON.stringify({ answerSlug: question.choices[0].slug, questionIndex: index }),
+    })
+    assert.equal(response.status, 200)
+    const result = await response.json() as { question: typeof question }
+    question = result.question
+  }
+  const detectiveResult = await fetch(`${baseUrl}/api/game/sessions/${detectiveSession.id}/complete`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', cookie },
+    body: JSON.stringify({}),
+  })
+  assert.equal(detectiveResult.status, 200)
+  const detectiveReward = await detectiveResult.json() as { progress: { experience: number } }
+  assert.ok(detectiveReward.progress.experience >= 25)
+
+  const trivia = await startTrivia()
+  assert.equal(trivia.status, 201)
+  const triviaSession = await trivia.json() as {
+    id: string
+    question: { index: number; total: number; prompt: string; choices: { slug: string; name: string; country: string }[] } | null
+  }
+  assert.ok(triviaSession.question)
+  assert.equal(triviaSession.question.total, 5)
+  assert.match(triviaSession.question.prompt, /^Which country is home to /)
+  assert.equal(triviaSession.question.choices.length, 4)
+  assert.ok(triviaSession.question.choices.every((choice) => choice.name && choice.country))
+
+  let triviaQuestion = triviaSession.question
+  let triviaScore = 0
+  for (let index = 0; index < 5; index += 1) {
+    assert.ok(triviaQuestion)
+    const response = await fetch(`${baseUrl}/api/game/sessions/${triviaSession.id}/answer`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', cookie },
+      body: JSON.stringify({ answerSlug: triviaQuestion.choices[0].slug, questionIndex: index, score: 10000 }),
+    })
+    assert.equal(response.status, 200)
+    const result = await response.json() as { score: number; question: typeof triviaQuestion }
+    triviaScore = result.score
+    assert.ok(triviaScore >= 0 && triviaScore <= index + 1)
+    triviaQuestion = result.question
+  }
+  const triviaResult = await fetch(`${baseUrl}/api/game/sessions/${triviaSession.id}/complete`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', cookie },
+    body: JSON.stringify({ experience: 999999 }),
+  })
+  assert.equal(triviaResult.status, 200)
+  const triviaReward = await triviaResult.json() as { score: number; rewardXp: number }
+  assert.equal(triviaReward.rewardXp, triviaReward.score * 10 + 25)
+})

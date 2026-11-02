@@ -8,7 +8,7 @@ An editorial travel-discovery and planning portfolio app with a destination CMS,
 
 - **Discover:** Search, filter, sort, save, and browse a curated destination catalogue at `/discover`; switch between story and approximate map views.
 - **Plan:** Use the Trip Studio to create and edit a demo day-by-day draft based on destination, origin, dates, party size, interests, pace, and budget. Saved drafts can be reopened at `/planner/:tripId`.
-- **Play:** Take the daily Destination Detective challenge at `/adventure`. The server validates choices and calculates virtual XP/stamps; signed, HttpOnly guest cookies associate progress without requiring an account.
+- **Play:** Explore the Passport Quest destination map at `/adventure`, open a field guide, and check whether each place is new, in progress, or completed. Destination Detective is always available; Travel Trivia unlocks at 25 XP. The server validates answers, scores missions, and awards virtual XP/stamps. Route Challenge is a clearly marked, not-yet-playable preview that requires 150 XP to unlock.
 - **Collect:** Review local saved trips/destinations and server-backed guest game progress at `/passport` or `/my-adventures`. Passport sharing contains progress only, never private trip details.
 - **Enquire:** The original `/plan` form still sends trip enquiries to the admin inbox.
 
@@ -36,9 +36,11 @@ npm run dev
 ## Game API and data
 
 - `GET /api/game/progress` returns the current guest's virtual progress.
-- `POST /api/game/sessions` starts the date-keyed daily challenge.
+- `POST /api/game/sessions` starts a date-keyed `destination-detective-YYYY-MM-DD` or `travel-trivia-YYYY-MM-DD` mission. Travel Trivia requires 25 XP; the server enforces this unlock.
 - `POST /api/game/sessions/:id/answer` accepts a destination slug from that question's choices; the server computes correctness and score.
-- `POST /api/game/sessions/:id/complete` awards the daily XP once and records stamps. Client-supplied scores or XP are ignored.
+- `POST /api/game/sessions/:id/complete` awards 10 XP per correct answer plus a 25 XP first-completion bonus once per mission/day, and records destination stamps. Client-supplied scores or XP are ignored.
+
+Both playable missions have five questions, one point per correct answer, server-checked answers, and a results screen. Map marker progress uses locally viewed destinations for "in progress" and server-backed passport stamps for "completed"; viewed-place history is stored in this browser only. The map is illustrative, not a navigation service. Route Challenge has no scoring or rewards yet and is not playable.
 
 Game sessions and progress are stored in `game-sessions.json` and `game-progress.json`. The guest cookie is signed with `SESSION_SECRET` and is HttpOnly/SameSite; guest progress is not authenticated account data.
 

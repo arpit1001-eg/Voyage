@@ -64,7 +64,9 @@ export const enquiryInput = z.object({
 
 export const loginInput = z.object({ password: z.string().min(1).max(200) })
 export const messagePatch = z.object({ read: z.boolean() })
-export const gameSessionInput = z.object({ challengeId: z.string().regex(/^destination-detective-\d{4}-\d{2}-\d{2}$/) })
+export const gameSessionInput = z.object({
+  challengeId: z.string().regex(/^(?:destination-detective|travel-trivia)-\d{4}-\d{2}-\d{2}$/),
+})
 export const gameAnswerInput = z.object({
   answerSlug: slug,
   questionIndex: z.number().int().min(0).max(20),

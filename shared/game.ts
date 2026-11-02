@@ -1,0 +1,2 @@
+export const TRAVEL_TRIVIA_UNLOCK_XP = 25
+export const ROUTE_CHALLENGE_UNLOCK_XP = 150

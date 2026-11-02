@@ -2700,12 +2700,462 @@ body {
   margin-top: 50px;
 }
 
+.quest-progress-strip {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr) auto;
+  align-items: center;
+  gap: 18px;
+  max-width: 1080px;
+  margin: 0 auto 55px;
+  padding: 18px 22px;
+  border: 1px solid var(--voyage-line);
+  background: #eeede6;
+}
+
+.quest-progress-strip > div {
+  display: grid;
+  gap: 4px;
+}
+
+.quest-progress-strip strong {
+  font-family: var(--font-display);
+  font-size: 30px;
+  font-weight: 400;
+  line-height: 1;
+}
+
+.quest-progress-strip span {
+  color: var(--voyage-muted);
+  font-size: 9px;
+}
+
+.quest-progress-strip > a {
+  color: var(--voyage-forest);
+  font-size: 10px;
+  text-decoration: none;
+}
+
+.quest-section {
+  max-width: 1080px;
+  margin: 0 auto 70px;
+}
+
+.quest-section-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 20px;
+}
+
+.quest-section-heading h2 {
+  margin: 7px 0 0;
+  font-family: var(--font-display);
+  font-size: clamp(32px, 4vw, 45px);
+  font-weight: 400;
+  letter-spacing: -.03em;
+  line-height: 1;
+}
+
+.quest-section-heading > .voyage-help {
+  margin: 0 0 3px;
+  font-size: 10px;
+  text-align: right;
+}
+
+.quest-map-layout {
+  display: grid;
+  grid-template-columns: 1.4fr .6fr;
+  gap: 15px;
+}
+
+.quest-map {
+  position: relative;
+  min-height: 450px;
+  overflow: hidden;
+  border: 1px solid #d0d1c5;
+  background-color: #e8e9de;
+  background-image:
+    radial-gradient(ellipse at 18% 39%, #d2d7c8 0 8%, transparent 8.5%),
+    radial-gradient(ellipse at 52% 29%, #d2d7c8 0 8%, transparent 8.5%),
+    radial-gradient(ellipse at 55% 61%, #d2d7c8 0 19%, transparent 19.5%),
+    radial-gradient(ellipse at 75% 42%, #d2d7c8 0 11%, transparent 11.5%);
+}
+
+.quest-map .map-grid {
+  pointer-events: none;
+}
+
+.quest-map-marker {
+  position: absolute;
+  z-index: 1;
+  display: grid;
+  justify-items: center;
+  gap: 5px;
+  padding: 8px;
+  border: 0;
+  background: transparent;
+  color: var(--voyage-ink);
+  cursor: pointer;
+  transform: translate(-50%, -50%);
+}
+
+.quest-marker-dot {
+  width: 12px;
+  height: 12px;
+  border: 2px solid white;
+  border-radius: 50%;
+  background: var(--voyage-terracotta);
+  box-shadow: 0 0 0 4px rgb(200 107 74 / 22%);
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+
+.quest-map-marker.status-in-progress .quest-marker-dot {
+  background: #c99b4c;
+  box-shadow: 0 0 0 4px rgb(201 155 76 / 23%);
+}
+
+.quest-map-marker.status-completed .quest-marker-dot {
+  background: #526e55;
+  box-shadow: 0 0 0 4px rgb(82 110 85 / 22%);
+}
+
+.quest-map-marker:hover .quest-marker-dot,
+.quest-map-marker:focus-visible .quest-marker-dot,
+.quest-map-marker.is-selected .quest-marker-dot {
+  transform: scale(1.25);
+  box-shadow: 0 0 0 7px rgb(200 107 74 / 20%);
+}
+
+.quest-marker-name {
+  max-width: 100px;
+  padding: 3px 6px;
+  border: 1px solid rgb(221 220 211 / 80%);
+  background: rgb(243 240 231 / 92%);
+  font-size: 8px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .16s ease;
+  white-space: nowrap;
+}
+
+.quest-map-marker:hover .quest-marker-name,
+.quest-map-marker:focus-visible .quest-marker-name,
+.quest-map-marker.is-selected .quest-marker-name {
+  opacity: 1;
+}
+
+.quest-guide {
+  overflow: hidden;
+  min-height: 450px;
+}
+
+.quest-guide-image {
+  overflow: hidden;
+  min-height: 165px;
+  background-color: #d7d9ce;
+}
+
+.quest-guide-image img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 165px;
+  object-fit: cover;
+}
+
+.quest-guide-copy {
+  display: grid;
+  gap: 10px;
+  padding: 19px;
+}
+
+.quest-guide-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  color: var(--voyage-muted);
+  font-size: 8px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+.quest-status {
+  padding: 5px 7px;
+  border: 1px solid var(--voyage-line);
+  color: #64705e;
+  font-size: 8px;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+
+.quest-guide-copy h3,
+.quest-mission-card h3 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 29px;
+  font-weight: 400;
+  line-height: 1;
+}
+
+.quest-guide-copy > p:not(.quest-guide-country) {
+  margin: 0;
+  color: var(--voyage-muted);
+  font-size: 10px;
+  line-height: 1.6;
+}
+
+.quest-guide-country {
+  margin: -5px 0 0;
+  color: #777e74;
+  font-size: 9px;
+}
+
+.quest-guide-mission {
+  display: grid;
+  gap: 5px;
+  margin: 4px 0;
+  padding: 11px 0;
+  border-top: 1px solid var(--voyage-line);
+  border-bottom: 1px solid var(--voyage-line);
+}
+
+.quest-guide-mission span {
+  color: #858b80;
+  font-size: 7px;
+  letter-spacing: .13em;
+}
+
+.quest-guide-mission strong {
+  color: var(--voyage-forest);
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 400;
+}
+
+.quest-guide-mission small {
+  color: var(--voyage-muted);
+  font-size: 8px;
+}
+
+.quest-guide-copy .voyage-button {
+  justify-content: center;
+  min-height: 38px;
+  padding: 10px;
+  font-size: 9px;
+}
+
+.quest-guide-empty {
+  display: grid;
+  min-height: 450px;
+  align-content: center;
+  justify-items: center;
+  gap: 9px;
+  padding: 24px;
+  color: var(--voyage-muted);
+  text-align: center;
+}
+
+.quest-guide-empty > span {
+  color: #a58458;
+  font-size: 34px;
+}
+
+.quest-guide-empty p {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 23px;
+}
+
+.quest-guide-empty small {
+  font-size: 9px;
+}
+
+.quest-map-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 17px;
+  margin-top: 12px;
+  color: var(--voyage-muted);
+  font-size: 9px;
+}
+
+.quest-map-legend span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.quest-map-legend i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--voyage-terracotta);
+}
+
+.quest-map-legend i.status-in-progress {
+  background: #c99b4c;
+}
+
+.quest-map-legend i.status-completed {
+  background: #526e55;
+}
+
+.quest-mission-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.quest-mission-card {
+  display: flex;
+  min-height: 315px;
+  flex-direction: column;
+  align-items: start;
+  padding: 20px;
+  border: 1px solid var(--voyage-line);
+  background: #f7f5ee;
+}
+
+.quest-mission-card.is-selected {
+  border-color: #89937f;
+  box-shadow: inset 0 0 0 1px #89937f;
+}
+
+.quest-mission-card.is-locked {
+  background: #eeede6;
+}
+
+.quest-mission-top {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.quest-mission-number {
+  color: #8a907f;
+  font-family: var(--font-display);
+  font-size: 24px;
+}
+
+.quest-mission-card > .voyage-eyebrow {
+  margin-bottom: 8px;
+  color: #858b80;
+  font-size: 7px;
+}
+
+.quest-mission-card h3 {
+  font-size: 25px;
+}
+
+.quest-mission-card > p:not(.voyage-eyebrow) {
+  min-height: 50px;
+  margin: 10px 0;
+  color: var(--voyage-muted);
+  font-size: 9px;
+  line-height: 1.6;
+}
+
+.quest-mission-rules {
+  display: grid;
+  gap: 6px;
+  width: 100%;
+  margin: auto 0 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--voyage-line);
+  color: #687063;
+  font-size: 8px;
+  line-height: 1.4;
+}
+
+.quest-mission-card > .text-link {
+  margin-top: 2px;
+}
+
+.quest-locked-note {
+  margin-top: auto;
+  color: #858b80;
+  font-size: 8px;
+  line-height: 1.5;
+}
+
+.quest-blocked {
+  display: grid;
+  min-height: 300px;
+  align-content: center;
+  justify-items: center;
+  gap: 10px;
+  text-align: center;
+}
+
+.quest-blocked h3 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 38px;
+  font-weight: 400;
+}
+
+.quest-blocked > p:not(.voyage-eyebrow) {
+  max-width: 420px;
+  color: var(--voyage-muted);
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.quest-play-section .challenge-card {
+  max-width: none;
+}
+
+.quest-play-section .planner-method {
+  max-width: none;
+}
+
 @keyframes hero-arrive {
   from { transform: scale(1.04); opacity: .65; }
   to { transform: scale(1); opacity: 1; }
 }
 
 @media (max-width: 900px) {
+  .quest-map-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .quest-map,
+  .quest-guide {
+    min-height: 360px;
+  }
+
+  .quest-guide {
+    display: grid;
+    grid-template-columns: .8fr 1.2fr;
+  }
+
+  .quest-guide-image {
+    min-height: 100%;
+  }
+
+  .quest-guide-image img {
+    height: 100%;
+  }
+
+  .quest-guide-empty {
+    grid-column: 1 / -1;
+    min-height: 260px;
+  }
+
+  .quest-mission-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .quest-mission-card:last-child {
+    grid-column: 1 / -1;
+    min-height: 250px;
+  }
+
   .discover-filter-row {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
@@ -2781,6 +3231,77 @@ body {
 }
 
 @media (max-width: 620px) {
+  .quest-progress-strip {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px 8px;
+    margin-bottom: 42px;
+    padding: 14px;
+  }
+
+  .quest-progress-strip strong {
+    font-size: 25px;
+  }
+
+  .quest-progress-strip span {
+    font-size: 7px;
+  }
+
+  .quest-progress-strip > a {
+    grid-column: 1 / -1;
+    padding-top: 8px;
+    border-top: 1px solid var(--voyage-line);
+    font-size: 9px;
+  }
+
+  .quest-section {
+    margin-bottom: 52px;
+  }
+
+  .quest-section-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .quest-section-heading > .voyage-help {
+    text-align: left;
+  }
+
+  .quest-map,
+  .quest-guide {
+    min-height: 330px;
+  }
+
+  .quest-guide {
+    display: block;
+  }
+
+  .quest-guide-image {
+    min-height: 135px;
+  }
+
+  .quest-guide-image img {
+    min-height: 135px;
+  }
+
+  .quest-guide-empty {
+    min-height: 240px;
+  }
+
+  .quest-mission-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .quest-mission-card,
+  .quest-mission-card:last-child {
+    min-height: 0;
+    grid-column: auto;
+  }
+
+  .quest-mission-card > p:not(.voyage-eyebrow) {
+    min-height: auto;
+  }
+
   .home-hero {
     min-height: 780px;
     min-height: 100svh;

@@ -28,7 +28,7 @@ export default function Passport() {
   const completedChallengeCount = gameProgress?.completedChallenges.length ?? 0
   const achievements = [
     { title: 'First Footsteps', description: 'Collect your first destination stamp.', earned: stamps.length > 0 },
-    { title: 'Map Master', description: 'Complete three daily field-note challenges.', earned: completedChallengeCount >= 3 },
+    { title: 'Mission Mapper', description: 'Complete three Passport Quest missions.', earned: completedChallengeCount >= 3 },
     { title: 'Culture Collector', description: 'Find five different destinations.', earned: stamps.length >= 5 },
     { title: 'World Wanderer', description: 'Reach 350 explorer XP.', earned: experience >= 350 },
   ]
@@ -88,7 +88,10 @@ export default function Passport() {
       <section className="passport-section">
         <div className="section-title-row"><div><p className="voyage-eyebrow">EARNED BY EXPLORING</p><h2>Little achievements.</h2></div><span className="stamp-count">{achievements.filter((item) => item.earned).length} of {achievements.length} unlocked</span></div>
         <div className="achievement-grid">{achievements.map((achievement) => <article className={`achievement-card ${achievement.earned ? 'is-earned' : ''}`} key={achievement.title}><span aria-hidden="true">{achievement.earned ? '✳' : '○'}</span><strong>{achievement.title}</strong><p>{achievement.description}</p><small>{achievement.earned ? 'UNLOCKED' : 'KEEP EXPLORING'}</small></article>)}</div>
-        {gameProgress?.completedChallenges.length ? <div className="challenge-history"><p className="voyage-eyebrow">FIELD NOTES COMPLETED</p>{gameProgress.completedChallenges.map((challenge) => <span key={challenge}>{challenge.replace('destination-detective-', 'Destination Detective · ')}</span>)}</div> : null}
+        {gameProgress?.completedChallenges.length ? <div className="challenge-history"><p className="voyage-eyebrow">MISSIONS COMPLETED</p>{gameProgress.completedChallenges.map((challenge) => {
+          const mission = challenge.startsWith('travel-trivia-') ? 'Travel Trivia' : 'Destination Detective'
+          return <span key={challenge}>{mission} · {challenge.slice(-10)}</span>
+        })}</div> : null}
       </section>
 
       <section className="passport-section">
